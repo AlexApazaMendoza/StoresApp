@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Stores</string>
+
+    <string name="arg_Id" translatable="false">keyId</string>
+
+    <string name="dialog_delete_title">¿Delete store?</string>
+    <string name="dialog_delete_confirm">Delete</string>
+    <string name="dialog_delete_cancel">Cancel</string>
+    <string name="dialog_options_title">¿What would you like to do?</string>
+
+    <string name="description_img_photo">Image of the store</string>
+    <string name="description_store_add">Create store</string>
+
+    <string name="edit_store_title_add">Create store</string>
+    <string name="edit_store_message_save_success">Store added successfully</string>
+    <string name="edit_store_message_update_success">Store updated</string>
+    <string name="edit_store_message_valid">Check the required fields</string>
+    <string name="edit_store_title_edit">Edit Store</string>
+
+    <string name="hint_name">Name of the store</string>
+    <string name="hint_phone">Phone</string>
+    <string name="hint_website">Url of the website</string>
+    <string name="hint_photo_url">Url of the image</string>
+
+    <string name="helper_required">Required</string>
+
+    <string name="menu_save">Save</string>
+
+    <string name="main_error_no_website">The store does not have a website</string>
+    <string name="main_error_no_resolve">No compatible app found</string>
+
+    <string name="options_item_call">Call</string>
+    <string name="options_item_website">Go to website</string>
+</resources>
