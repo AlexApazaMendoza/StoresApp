@@ -1,27 +1,21 @@
-package com.example.stores
+package com.example.stores.mainModule
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.InputFilter
 import com.example.stores.databinding.ActivityMainBinding
-import android.text.Spanned
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.stores.*
+import com.example.stores.common.utils.MainAux
+import com.example.stores.common.entities.StoreEntity
+import com.example.stores.editModule.EditStoreFragment
+import com.example.stores.mainModule.adapters.StoreAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.*
-import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.*
-import java.io.IOException
 
 class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
 
@@ -151,7 +145,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
 
     private fun goToWebsite(website:String){
         if(website.isEmpty()){
-            Toast.makeText(this,R.string.main_error_no_website,Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.main_error_no_website,Toast.LENGTH_SHORT).show()
         } else{
             val websiteIntent = Intent().apply {
                 action = Intent.ACTION_VIEW
@@ -164,7 +158,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         if(intent.resolveActivity(packageManager) != null){
             startActivity(intent)
         } else{
-            Toast.makeText(this,R.string.main_error_no_resolve,Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.main_error_no_resolve,Toast.LENGTH_SHORT).show()
         }
     }
 

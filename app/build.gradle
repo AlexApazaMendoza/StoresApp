@@ -36,7 +36,6 @@ android {
 }
 
 def roomVersion = "2.2.5"
-def lifecycle_version = "2.6.0-alpha02"
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
@@ -75,5 +74,5 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
 
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
 }
