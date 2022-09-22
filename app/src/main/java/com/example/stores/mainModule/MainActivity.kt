@@ -88,15 +88,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         }
     }
 
-    /*private fun getStores(){
-        doAsync {
-            val stores = StoreApplication.database.storeDao().getAllStores()
-            uiThread {
-                mAdapter.setStores(stores)
-            }
-        }
-    }*/
-
     /***
      * OnClickListener Interface
      */
@@ -108,13 +99,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
     }
 
     override fun onFavouriteStore(storeEntity: StoreEntity) {
-        storeEntity.isFavorite = !storeEntity.isFavorite
-        doAsync {
-            StoreApplication.database.storeDao().updateStore(storeEntity)
-            uiThread {
-                updateStore(storeEntity)
-            }
-        }
+        mViewModel.updateStore(storeEntity)
     }
 
     override fun onDeleteStore(storeEntity: StoreEntity) {
@@ -137,12 +122,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_delete_title)
             .setPositiveButton(R.string.dialog_delete_confirm) { _, _ ->
-                doAsync {
-                    StoreApplication.database.storeDao().deleteStore(storeEntity)
-                    uiThread {
-                        mAdapter.delete(storeEntity)
-                    }
-                }
+                mViewModel.deleteStore(storeEntity)
             }
             .setNegativeButton(R.string.dialog_delete_cancel,null)
             .show()
@@ -194,71 +174,5 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
     override fun updateStore(storeEntity: StoreEntity) {
         mAdapter.update(storeEntity)
     }
-/*private fun setupOkhttpInterceptor() {
-
-        var interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        //Metodo 1
-        //var okHttpClient = OkHttpClient().interceptors().add(interceptor)
-        //Metodo 2
-        var okHttpClient = OkHttpClient()
-            .newBuilder()
-            .addInterceptor(interceptor)
-            .build()
-
-
-        var url = "https://reqres.in/api/users?page=2"
-
-        var request: Request = Request.Builder()
-            .url(url)
-            .build()
-
-        okHttpClient.newCall(request).enqueue(object : Callback{
-            override fun onFailure(call: Call, e: IOException) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful){
-                    var myResponse = response.body()?.string()
-
-                    GlobalScope.launch(Dispatchers.Main) {
-                        mBinding.etName.setText(myResponse)
-                    }
-
-                }
-            }
-
-        })
-    }
-
-    private fun setupOkhttp() {
-        var okHttpClient:OkHttpClient = OkHttpClient()
-
-        var url = "https://reqres.in/api/users?page=2"
-
-        var request:Request = Request.Builder()
-            .url(url)
-            .build()
-
-        okHttpClient.newCall(request).enqueue(object : Callback{
-            override fun onFailure(call: Call, e: IOException) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful){
-                    var myResponse = response.body()?.string()
-
-                    GlobalScope.launch(Dispatchers.Main) {
-                        mBinding.etName.setText(myResponse)
-                    }
-
-                }
-            }
-
-        })
-    }*/
 
 }

@@ -7,24 +7,29 @@ import org.jetbrains.anko.uiThread
 
 class MainInteractor {
 
-    interface StoresCallback{
-        fun getStoresCallback(stores: MutableList<StoreEntity>)
-    }
-
-    fun getStoresCallback(callback: StoresCallback){
-        doAsync {
-            val storesList = StoreApplication.database.storeDao().getAllStores()
-            uiThread {
-                callback.getStoresCallback(storesList)
-            }
-        }
-    }
-
     fun getStores(callback: (MutableList<StoreEntity>) -> Unit){
         doAsync {
             val storesList = StoreApplication.database.storeDao().getAllStores()
             uiThread {
                 callback(storesList)
+            }
+        }
+    }
+
+    fun deleteStore(storeEntity: StoreEntity, callback: (StoreEntity) -> Unit ){
+        doAsync {
+            StoreApplication.database.storeDao().deleteStore(storeEntity)
+            uiThread {
+                callback(storeEntity)
+            }
+        }
+    }
+
+    fun updateStore(storeEntity: StoreEntity, callback: (StoreEntity) -> Unit){
+        doAsync {
+            StoreApplication.database.storeDao().updateStore(storeEntity)
+            uiThread {
+                callback(storeEntity)
             }
         }
     }

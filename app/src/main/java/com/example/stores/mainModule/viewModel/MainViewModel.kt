@@ -11,10 +11,13 @@ import org.jetbrains.anko.uiThread
 
 class MainViewModel: ViewModel() {
 
+    private var storeList: MutableList<StoreEntity>
+
     private val interactor: MainInteractor
 
     init {
         interactor = MainInteractor()
+        storeList = mutableListOf()
         //stores = MutableLiveData()
         //loadStores()
     }
@@ -30,15 +33,32 @@ class MainViewModel: ViewModel() {
         return stores
     }
 
-    private fun loadStores(){
+    fun loadStores(){
         interactor.getStores {
             stores.value = it
+            storeList = it
         }
-        /*interactor.getStoresCallback(object :MainInteractor.StoresCallback{
-            override fun getStoresCallback(stores: MutableList<StoreEntity>) {
-                this@MainViewModel.stores.value = stores
+    }
+
+    fun deleteStore(storeEntity: StoreEntity){
+        interactor.deleteStore(storeEntity) {
+            val index = storeList.indexOf(it)
+            if (index != -1) {
+                storeList.removeAt(index)
+                stores.value = storeList
             }
-        })*/
+        }
+    }
+
+    fun updateStore(storeEntity: StoreEntity){
+        storeEntity.isFavorite = !storeEntity.isFavorite
+        interactor.deleteStore(storeEntity) {
+            val index = storeList.indexOf(it)
+            if(index != -1){
+                storeList[index] = storeEntity
+                stores.value = storeList
+            }
+        }
     }
 
 }
