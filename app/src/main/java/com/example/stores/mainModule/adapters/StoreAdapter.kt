@@ -76,7 +76,7 @@ RecyclerView.Adapter<StoreAdapter.ViewHolder>(){
 
         fun setListener(storeEntity: StoreEntity){
             binding.root.setOnClickListener{
-                listener.onClick(storeEntity.id)
+                listener.onClick(storeEntity)
             }
             binding.root.setOnLongClickListener {
                 listener.onDeleteStore(storeEntity)

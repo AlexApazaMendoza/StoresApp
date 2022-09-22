@@ -14,12 +14,13 @@ import com.example.stores.*
 import com.example.stores.common.utils.MainAux
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.editModule.EditStoreFragment
+import com.example.stores.editModule.viewModel.EditStoreViewModel
 import com.example.stores.mainModule.adapters.StoreAdapter
 import com.example.stores.mainModule.viewModel.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.*
 
-class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
+class MainActivity : AppCompatActivity(), OnClickListener {
 
     private lateinit var mBinding:ActivityMainBinding
     private lateinit var mAdapter: StoreAdapter
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
 
     //MVVM
     private lateinit var mViewModel: MainViewModel
+    private lateinit var mEditStoreViewModel: EditStoreViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,18 +37,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
 
         setUpViewModel()
         setupRecyclerView()
-
-        //setupOkhttp()
-        //setupOkhttpInterceptor()
-
-        /*mBinding.btnSave.setOnClickListener {
-            val store = StoreEntity(name = mBinding.etName.text.toString().trim())
-            Thread{
-                StoreApplication.database.storeDao().addStore(store)
-            }.start()
-
-            mAdapter.add(store)
-        }*/
 
         mBinding.fab.setOnClickListener {
             launchEditFragment()
@@ -58,22 +48,24 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         mViewModel.getStores().observe(this) { stores ->
             mAdapter.setStores(stores)
         }
+
+        mEditStoreViewModel = ViewModelProvider(this)[EditStoreViewModel::class.java]
+        mEditStoreViewModel.getShowFav().observe(this){
+            if(it) mBinding.fab.show() else mBinding.fab.hide()
+        }
     }
 
-    private fun launchEditFragment(args: Bundle? = null) {
-        val fragment = EditStoreFragment()
-        if(args != null){
-            fragment.arguments = args
-        }
+    private fun launchEditFragment(storeEntity: StoreEntity = StoreEntity()) {
+        mEditStoreViewModel.setShowFav(false)
+        mEditStoreViewModel.setStoreSelected(storeEntity)
 
+        val fragment = EditStoreFragment()
         val fragmentManager = supportFragmentManager    // gestor que trae android para controlar los fragmentos
         val fragmentTransaction = fragmentManager.beginTransaction()   // es quien va a decidir como se va a ejecutar
 
         fragmentTransaction.add(R.id.containerMain, fragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
-
-        hideFab()
     }
 
     private fun setupRecyclerView() {
@@ -91,11 +83,8 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
     /***
      * OnClickListener Interface
      */
-    override fun onClick(storeId: Long) {
-        val args = Bundle() // Clave, valor
-        args.putLong(getString(R.string.arg_Id), storeId)
-
-        launchEditFragment(args)
+    override fun onClick(storeEntity: StoreEntity) {
+        launchEditFragment(storeEntity)
     }
 
     override fun onFavouriteStore(storeEntity: StoreEntity) {
@@ -153,26 +142,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         } else{
             Toast.makeText(this, R.string.main_error_no_resolve,Toast.LENGTH_SHORT).show()
         }
-    }
-
-    /***
-     * MainAux Interface
-     */
-    override fun hideFab(isVisible: Boolean) {
-        if(isVisible) mBinding.fab.show() else mBinding.fab.hide()
-    }
-
-    override fun hideKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(contentView?.windowToken,0)
-    }
-
-    override fun addStore(storeEntity: StoreEntity) {
-        mAdapter.add(storeEntity)
-    }
-
-    override fun updateStore(storeEntity: StoreEntity) {
-        mAdapter.update(storeEntity)
     }
 
 }
