@@ -20,4 +20,13 @@ class MainInteractor {
         }
     }
 
+    fun getStores(callback: (MutableList<StoreEntity>) -> Unit){
+        doAsync {
+            val storesList = StoreApplication.database.storeDao().getAllStores()
+            uiThread {
+                callback(storesList)
+            }
+        }
+    }
+
 }

@@ -31,11 +31,14 @@ class MainViewModel: ViewModel() {
     }
 
     private fun loadStores(){
-        interactor.getStoresCallback(object :MainInteractor.StoresCallback{
+        interactor.getStores {
+            stores.value = it
+        }
+        /*interactor.getStoresCallback(object :MainInteractor.StoresCallback{
             override fun getStoresCallback(stores: MutableList<StoreEntity>) {
                 this@MainViewModel.stores.value = stores
             }
-        })
+        })*/
     }
 
 }
