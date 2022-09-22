@@ -43,40 +43,16 @@ class EditStoreFragment : Fragment() {
 
     private var mActivity: MainActivity? = null
     private var mIsEditMode: Boolean = false
-    private var mStoreEntity: StoreEntity? = null
+    private lateinit var mStoreEntity: StoreEntity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
-            //id = it.getLong(getString(R.string.arg_Id),0L)
         }
 
         mViewModel = ViewModelProvider(requireActivity())[EditStoreViewModel::class.java]
-        /*if(id != null && id!=0L){
-            mIsEditMode = true
-            getStore(id!!)
-        } else {
-            mIsEditMode = false
-            mStoreEntity = StoreEntity(
-                name = "",
-                phone = "",
-                photoUrl = "",
-                website = ""
-            )
-        }*/
-    }
-
-    private fun getStore(id: Long) {
-        doAsync {
-            mStoreEntity = StoreApplication.database.storeDao().getStore(id)
-            uiThread {
-                if(mStoreEntity != null){
-                    setUiStore(mStoreEntity!!)
-                }
-            }
-        }
     }
 
     private fun setUiStore(storeEntity: StoreEntity) {
@@ -124,13 +100,13 @@ class EditStoreFragment : Fragment() {
             mActivity?.hideKeyboard()
             when(it){
                 is Long -> {
-                    mStoreEntity!!.id = it
-                    mViewModel.setStoreSelected(mStoreEntity!!)
+                    mStoreEntity.id = it
+                    mViewModel.setStoreSelected(mStoreEntity)
                     Toast.makeText(mActivity,getString(R.string.edit_store_message_save_success),Toast.LENGTH_LONG).show()
                     mActivity?.onBackPressed()
                 }
                 is StoreEntity -> {
-                    mViewModel.setStoreSelected(mStoreEntity!!)
+                    mViewModel.setStoreSelected(mStoreEntity)
                     Snackbar.make(mBinding.root,R.string.edit_store_message_update_success, Snackbar.LENGTH_SHORT).show()
                 }
                 else -> {
@@ -182,8 +158,8 @@ class EditStoreFragment : Fragment() {
                 true
             }
             R.id.action_save -> {
-                if(mStoreEntity != null && validateFields(mBinding.tilPhotoUrl, mBinding.tilPhone, mBinding.tilName)){
-                    with(mStoreEntity!!){
+                if(validateFields(mBinding.tilPhotoUrl, mBinding.tilPhone, mBinding.tilName)){
+                    with(mStoreEntity){
                         name = mBinding.etName.text.toString().trim()
                         phone = mBinding.etPhone.text.toString().trim()
                         website = mBinding.etWebsite.text.toString().trim()
@@ -191,9 +167,9 @@ class EditStoreFragment : Fragment() {
                     }
 
                     if (mIsEditMode){
-                        mViewModel.updateStore(mStoreEntity!!)
+                        mViewModel.updateStore(mStoreEntity)
                     } else{
-                        mViewModel.saveStore(mStoreEntity!!)
+                        mViewModel.saveStore(mStoreEntity)
                     }
                 }
                 true
@@ -218,28 +194,6 @@ class EditStoreFragment : Fragment() {
         if (!isValid) Snackbar
             .make(mBinding.root, R.string.edit_store_message_valid, Snackbar.LENGTH_SHORT)
             .show()
-
-        return isValid
-    }
-
-    private fun validateFields(): Boolean {
-        var isValid = true
-
-        if (mBinding.etPhotoUrl.text.toString().trim().isEmpty()){
-            mBinding.tilPhotoUrl.error = getString(R.string.helper_required)
-            mBinding.etPhotoUrl.requestFocus()
-            isValid =false
-        }
-        if (mBinding.etPhone.text.toString().trim().isEmpty()){
-            mBinding.tilPhone.error = getString(R.string.helper_required)
-            mBinding.etPhone.requestFocus()
-            isValid =false
-        }
-        if (mBinding.etName.text.toString().trim().isEmpty()){
-            mBinding.tilName.error = getString(R.string.helper_required)
-            mBinding.etName.requestFocus()
-            isValid =false
-        }
 
         return isValid
     }
