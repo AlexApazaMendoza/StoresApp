@@ -42,8 +42,8 @@ RecyclerView.Adapter<StoreAdapter.ViewHolder>(){
     override fun getItemCount(): Int = stores.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setStores(stores: MutableList<StoreEntity>) {
-        this.stores = stores
+    fun setStores(stores: List<StoreEntity>) {
+        this.stores = stores as MutableList<StoreEntity>
         notifyDataSetChanged()
     }
 

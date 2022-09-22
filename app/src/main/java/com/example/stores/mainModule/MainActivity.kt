@@ -8,12 +8,14 @@ import android.os.Bundle
 import com.example.stores.databinding.ActivityMainBinding
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.stores.*
 import com.example.stores.common.utils.MainAux
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.editModule.EditStoreFragment
 import com.example.stores.mainModule.adapters.StoreAdapter
+import com.example.stores.mainModule.viewModel.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.*
 
@@ -23,11 +25,15 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
     private lateinit var mAdapter: StoreAdapter
     private lateinit var mGridLayout: GridLayoutManager
 
+    //MVVM
+    private lateinit var mViewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
 
+        setUpViewModel()
         setupRecyclerView()
 
         //setupOkhttp()
@@ -44,6 +50,13 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
 
         mBinding.fab.setOnClickListener {
             launchEditFragment()
+        }
+    }
+
+    private fun setUpViewModel() {
+        mViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        mViewModel.getStores().observe(this) { stores ->
+            mAdapter.setStores(stores)
         }
     }
 
@@ -66,7 +79,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
     private fun setupRecyclerView() {
         mAdapter = StoreAdapter(mutableListOf(),this)
         mGridLayout = GridLayoutManager(this,resources.getInteger(R.integer.main_columns))
-        getStores()
+        //getStores()
 
         mBinding.recyclerView.apply {
             setHasFixedSize(true)
@@ -75,14 +88,14 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         }
     }
 
-    private fun getStores(){
+    /*private fun getStores(){
         doAsync {
             val stores = StoreApplication.database.storeDao().getAllStores()
             uiThread {
                 mAdapter.setStores(stores)
             }
         }
-    }
+    }*/
 
     /***
      * OnClickListener Interface
