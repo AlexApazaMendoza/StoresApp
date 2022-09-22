@@ -119,6 +119,25 @@ class EditStoreFragment : Fragment() {
             }
             setUpActionBar()
         }
+
+        mViewModel.getResult().observe(viewLifecycleOwner){
+            mActivity?.hideKeyboard()
+            when(it){
+                is Long -> {
+                    mStoreEntity!!.id = it
+                    mViewModel.setStoreSelected(mStoreEntity!!)
+                    Toast.makeText(mActivity,getString(R.string.edit_store_message_save_success),Toast.LENGTH_LONG).show()
+                    mActivity?.onBackPressed()
+                }
+                is StoreEntity -> {
+                    mViewModel.setStoreSelected(mStoreEntity!!)
+                    Snackbar.make(mBinding.root,R.string.edit_store_message_update_success, Snackbar.LENGTH_SHORT).show()
+                }
+                else -> {
+
+                }
+            }
+        }
     }
 
     private fun setUpActionBar() {
@@ -164,38 +183,17 @@ class EditStoreFragment : Fragment() {
             }
             R.id.action_save -> {
                 if(mStoreEntity != null && validateFields(mBinding.tilPhotoUrl, mBinding.tilPhone, mBinding.tilName)){
-                    /*val store = StoreEntity(
-                    name = mBinding.etName.text.toString().trim(),
-                    phone = mBinding.etPhone.text.toString().trim(),
-                    website = mBinding.etWebsite.text.toString().trim(),
-                    photoUrl = mBinding.etPhotoUrl.text.toString().trim()
-                    )*/
                     with(mStoreEntity!!){
                         name = mBinding.etName.text.toString().trim()
                         phone = mBinding.etPhone.text.toString().trim()
                         website = mBinding.etWebsite.text.toString().trim()
                         photoUrl = mBinding.etPhotoUrl.text.toString().trim()
                     }
-                    doAsync {
-                        if (mIsEditMode){
-                            StoreApplication.database.storeDao().updateStore(mStoreEntity!!)
-                        } else{
-                            mStoreEntity!!.id = StoreApplication.database.storeDao().addStore(mStoreEntity!!)
-                        }
-                        uiThread {
-                            //mActivity?.hideKeyboard()
-                            if(mIsEditMode){
-                                //mActivity?.updateStore(mStoreEntity!!)
-                                Snackbar.make(mBinding.root,R.string.edit_store_message_update_success, Snackbar.LENGTH_SHORT).show()
-                            } else{
-                                //mActivity?.addStore(mStoreEntity!!)
 
-                                Toast
-                                    .makeText(mActivity,getString(R.string.edit_store_message_save_success),Toast.LENGTH_LONG)
-                                    .show()
-                                mActivity?.onBackPressed()
-                            }
-                        }
+                    if (mIsEditMode){
+                        mViewModel.updateStore(mStoreEntity!!)
+                    } else{
+                        mViewModel.saveStore(mStoreEntity!!)
                     }
                 }
                 true
@@ -247,7 +245,7 @@ class EditStoreFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        //mActivity?.hideKeyboard()
+        mActivity?.hideKeyboard()
         super.onDestroyView()
     }
 
@@ -256,6 +254,7 @@ class EditStoreFragment : Fragment() {
         mActivity?.supportActionBar?.title = getString(R.string.app_name)
 
         mViewModel.setShowFav(true)
+        mViewModel.setResult(Any())
         setHasOptionsMenu(false)
         super.onDestroy()
     }

@@ -48,14 +48,18 @@ RecyclerView.Adapter<StoreAdapter.ViewHolder>(){
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun add(store: StoreEntity) {
-        if(!stores.contains(store)){
-            stores.add(store)
-            notifyItemInserted(stores.size-1)
+    fun add(storeEntity: StoreEntity) {
+        if(storeEntity.id != 0L){
+            if(!stores.contains(storeEntity)){
+                stores.add(storeEntity)
+                notifyItemInserted(stores.size-1)
+            } else {
+                update(storeEntity)
+            }
         }
     }
 
-    fun update(storeEntity: StoreEntity) {
+    private fun update(storeEntity: StoreEntity) {
         val index = stores.indexOf(storeEntity)
         if(index != -1){
             stores[index] = storeEntity
@@ -63,13 +67,13 @@ RecyclerView.Adapter<StoreAdapter.ViewHolder>(){
         }
     }
 
-    fun delete(storeEntity: StoreEntity) {
+    /*fun delete(storeEntity: StoreEntity) {
         val index = stores.indexOf(storeEntity)
         if(index != -1){
             stores.removeAt(index)
             notifyItemRemoved(index)
         }
-    }
+    }*/
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
         val binding = ItemStoreBinding.bind(view)

@@ -20,7 +20,7 @@ import com.example.stores.mainModule.viewModel.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.*
 
-class MainActivity : AppCompatActivity(), OnClickListener {
+class MainActivity : AppCompatActivity(), OnClickListener,MainAux {
 
     private lateinit var mBinding:ActivityMainBinding
     private lateinit var mAdapter: StoreAdapter
@@ -52,6 +52,9 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         mEditStoreViewModel = ViewModelProvider(this)[EditStoreViewModel::class.java]
         mEditStoreViewModel.getShowFav().observe(this){
             if(it) mBinding.fab.show() else mBinding.fab.hide()
+        }
+        mEditStoreViewModel.getStoreSelected().observe(this){
+            mAdapter.add(it)
         }
     }
 
@@ -142,6 +145,11 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         } else{
             Toast.makeText(this, R.string.main_error_no_resolve,Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(contentView?.windowToken,0)
     }
 
 }
