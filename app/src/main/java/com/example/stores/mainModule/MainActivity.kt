@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.example.stores.databinding.ActivityMainBinding
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux {
         mViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         mViewModel.getStores().observe(this) { stores ->
             mAdapter.setStores(stores)
+            mBinding.progressBar.visibility = if (stores.isEmpty()) View.VISIBLE else View.GONE
         }
 
         mEditStoreViewModel = ViewModelProvider(this)[EditStoreViewModel::class.java]
