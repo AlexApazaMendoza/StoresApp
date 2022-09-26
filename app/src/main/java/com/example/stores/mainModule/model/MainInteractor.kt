@@ -42,14 +42,13 @@ class MainInteractor {
                     val mutableListType = object : TypeToken<MutableList<StoreEntity>>(){}.type
                     val storeList = Gson().fromJson<MutableList<StoreEntity>>(jsonList, mutableListType)
                     callback(storeList)
-                } else{
-                    callback(mutableListOf())
+                    return@JsonObjectRequest
                 }
-            } else{
-                callback(mutableListOf())
             }
+            callback(mutableListOf())
         },{
             it.printStackTrace()
+            callback(mutableListOf())
         })
 
         StoreApplication.storeAPI.addToRequestQueue(jsonObjectRequest)
