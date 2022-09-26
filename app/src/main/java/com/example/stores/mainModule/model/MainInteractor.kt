@@ -28,21 +28,21 @@ class MainInteractor {
         val url = Constants.STORES_URL + Constants.GET_ALL_PATH
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null, {
+            //val status = it.getInt(Constants.STATUS_PROPERTY)
 
-            val status = it.getInt(Constants.STATUS_PROPERTY)
+            val status = it.optInt(Constants.STATUS_PROPERTY, Constants.ERROR)  //de manera opcional extrae un elemento
+
             if(status == Constants.SUCCESS){
                 /*val jsonObject = Gson().fromJson(
                     it.getJSONArray(Constants.STORES_PROPERTY).get(0).toString(),
                     StoreEntity::class.java
                 )*/
-
-                val jsonList = it.getJSONArray(Constants.STORES_PROPERTY).toString()
-
-                val mutableListType = object : TypeToken<MutableList<StoreEntity>>(){}.type
-
-                val storeList = Gson().fromJson<MutableList<StoreEntity>>(jsonList, mutableListType)
-
-                callback(storeList)
+                val jsonList = it.optJSONArray(Constants.STORES_PROPERTY)?.toString()
+                if(jsonList != null){
+                    val mutableListType = object : TypeToken<MutableList<StoreEntity>>(){}.type
+                    val storeList = Gson().fromJson<MutableList<StoreEntity>>(jsonList, mutableListType)
+                    callback(storeList)
+                }
 
             }
         },{
