@@ -42,8 +42,11 @@ class MainInteractor {
                     val mutableListType = object : TypeToken<MutableList<StoreEntity>>(){}.type
                     val storeList = Gson().fromJson<MutableList<StoreEntity>>(jsonList, mutableListType)
                     callback(storeList)
+                } else{
+                    callback(mutableListOf())
                 }
-
+            } else{
+                callback(mutableListOf())
             }
         },{
             it.printStackTrace()
