@@ -23,13 +23,13 @@ class MainViewModel: ViewModel() {
     }
 
 
-    private val stores: MutableLiveData<List<StoreEntity>> by lazy { //Se ejecuta una vez
-        MutableLiveData<List<StoreEntity>>().also { //Lanza la consulta inicial
+    private val stores: MutableLiveData<MutableList<StoreEntity>> by lazy { //Se ejecuta una vez
+        MutableLiveData<MutableList<StoreEntity>>().also { //Lanza la consulta inicial
             loadStores()
         }
     }
 
-    fun getStores(): LiveData<List<StoreEntity>>{
+    fun getStores(): LiveData<MutableList<StoreEntity>>{
         return stores
     }
 
