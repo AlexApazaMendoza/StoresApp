@@ -3,10 +3,12 @@ package com.example.stores.mainModule.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.stores.StoreApplication
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.common.utils.Constants
 import com.example.stores.mainModule.model.MainInteractor
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -59,13 +61,9 @@ class MainViewModel: ViewModel() {
     }
 
     fun updateStore(storeEntity: StoreEntity){
-        storeEntity.isFavorite = !storeEntity.isFavorite
-        interactor.deleteStore(storeEntity) {
-            val index = storeList.indexOf(it)
-            if(index != -1){
-                storeList[index] = storeEntity
-                stores.value = storeList
-            }
+        viewModelScope.launch {
+            storeEntity.isFavorite = !storeEntity.isFavorite
+            interactor.updateStore(storeEntity)
         }
     }
 

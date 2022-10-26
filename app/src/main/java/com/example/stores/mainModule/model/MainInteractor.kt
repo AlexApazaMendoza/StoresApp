@@ -8,6 +8,7 @@ import com.example.stores.common.entities.StoreEntity
 import com.example.stores.common.utils.Constants
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.delay
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -62,13 +63,9 @@ class MainInteractor {
         }
     }
 
-    fun updateStore(storeEntity: StoreEntity, callback: (StoreEntity) -> Unit){
-        doAsync {
-            StoreApplication.database.storeDao().updateStore(storeEntity)
-            uiThread {
-                callback(storeEntity)
-            }
-        }
+    suspend fun updateStore(storeEntity: StoreEntity){
+        delay(1000)
+        StoreApplication.database.storeDao().updateStore(storeEntity)
     }
 
 }
