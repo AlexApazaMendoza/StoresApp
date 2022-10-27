@@ -87,7 +87,7 @@ class EditStoreFragment : Fragment() {
     private fun setUpViewModel() {
         mViewModel.getStoreSelected().observe(viewLifecycleOwner){
             mStoreEntity = it
-            if(it.id!=0L){
+            if(it != null){
                 mIsEditMode = true
                 setUiStore(it)
             } else {

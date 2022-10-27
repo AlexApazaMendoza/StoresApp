@@ -65,13 +65,9 @@ class MainInteractor {
             stores.sortedBy { it.name }.toMutableList()
         })
     }
-    fun deleteStore(storeEntity: StoreEntity, callback: (StoreEntity) -> Unit ){
-        doAsync {
-            StoreApplication.database.storeDao().deleteStore(storeEntity)
-            uiThread {
-                callback(storeEntity)
-            }
-        }
+    suspend fun deleteStore(storeEntity: StoreEntity){
+        delay(2000)
+        StoreApplication.database.storeDao().deleteStore(storeEntity)
     }
 
     suspend fun updateStore(storeEntity: StoreEntity){
