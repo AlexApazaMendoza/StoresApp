@@ -17,6 +17,7 @@ import com.example.stores.common.entities.StoreEntity
 import com.example.stores.editModule.EditStoreFragment
 import com.example.stores.editModule.viewModel.EditStoreViewModel
 import com.example.stores.mainModule.adapters.StoreAdapter
+import com.example.stores.mainModule.adapters.StoreListAdapter
 import com.example.stores.mainModule.viewModel.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.*
@@ -24,7 +25,7 @@ import org.jetbrains.anko.*
 class MainActivity : AppCompatActivity(), OnClickListener,MainAux {
 
     private lateinit var mBinding:ActivityMainBinding
-    private lateinit var mAdapter: StoreAdapter
+    private lateinit var mAdapter: StoreListAdapter
     private lateinit var mGridLayout: GridLayoutManager
 
     //MVVM
@@ -47,15 +48,13 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux {
     private fun setUpViewModel() {
         mViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         mViewModel.getStores().observe(this) { stores ->
-            mAdapter.setStores(stores)
+            mBinding.progressBar.visibility = View.GONE
+            mAdapter.submitList(stores)
         }
 
         mEditStoreViewModel = ViewModelProvider(this)[EditStoreViewModel::class.java]
         mEditStoreViewModel.getShowFav().observe(this){
             if(it) mBinding.fab.show() else mBinding.fab.hide()
-        }
-        mEditStoreViewModel.getStoreSelected().observe(this){
-            mAdapter.add(it)
         }
         mViewModel.isShowProgressBar().observe(this){
             mBinding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
@@ -76,7 +75,7 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux {
     }
 
     private fun setupRecyclerView() {
-        mAdapter = StoreAdapter(mutableListOf(),this)
+        mAdapter = StoreListAdapter(this)
         mGridLayout = GridLayoutManager(this,resources.getInteger(R.integer.main_columns))
 
         mBinding.recyclerView.apply {

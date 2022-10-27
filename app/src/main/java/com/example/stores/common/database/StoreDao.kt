@@ -1,5 +1,6 @@
 package com.example.stores.common.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.stores.common.entities.StoreEntity
 
@@ -7,7 +8,7 @@ import com.example.stores.common.entities.StoreEntity
 interface StoreDao {
 
     @Query("select *from StoreEntity")
-    fun getAllStores() : MutableList<StoreEntity>
+    fun getAllStores() : LiveData<MutableList<StoreEntity>>
 
     @Insert
     fun addStore(storeEntity: StoreEntity): Long

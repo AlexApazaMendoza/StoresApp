@@ -31,32 +31,33 @@ class MainViewModel: ViewModel() {
         return showProcess
     }
 
-    private val stores: MutableLiveData<MutableList<StoreEntity>> by lazy { //Se ejecuta una vez
+    /*private val stores: MutableLiveData<MutableList<StoreEntity>> by lazy { //Se ejecuta una vez
         MutableLiveData<MutableList<StoreEntity>>().also { //Lanza la consulta inicial
             loadStores()
         }
-    }
+    }*/
+    private val stores = interactor.stores
 
     fun getStores(): LiveData<MutableList<StoreEntity>>{
         return stores
     }
 
-    fun loadStores(){
+    /*fun loadStores(){
         showProcess.value = Constants.SHOW
         interactor.getStores {
             showProcess.value = Constants.HIDE
             stores.value = it
             storeList = it
         }
-    }
+    }*/
 
     fun deleteStore(storeEntity: StoreEntity){
         interactor.deleteStore(storeEntity) {
-            val index = storeList.indexOf(it)
+            /*val index = storeList.indexOf(it)
             if (index != -1) {
                 storeList.removeAt(index)
                 stores.value = storeList
-            }
+            }*/
         }
     }
 
