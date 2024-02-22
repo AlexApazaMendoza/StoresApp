@@ -31,4 +31,7 @@
 
     <string name="options_item_call">Call</string>
     <string name="options_item_website">Go to website</string>
+    <string name="dialog_exit_title">¿Salir de esta pantalla?</string>
+    <string name="dialog_exit_message">Si no ha guardado cambios, se perderán</string>
+    <string name="dialog_exit_ok">Salir</string>
 </resources>
