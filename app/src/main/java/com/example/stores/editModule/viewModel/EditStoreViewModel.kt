@@ -3,8 +3,11 @@ package com.example.stores.editModule.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.editModule.model.EditInteractor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class EditStoreViewModel :ViewModel() {
 
@@ -44,8 +47,10 @@ class EditStoreViewModel :ViewModel() {
     }
 
     fun updateStore(storeEntity: StoreEntity){
-        interactor.updateStore(storeEntity) {
-            result.value = it
+        viewModelScope.launch(Dispatchers.IO) {
+            interactor.updateStore(storeEntity) {
+                result.value = it
+            }
         }
     }
 
