@@ -1,9 +1,11 @@
 package com.example.stores.editModule
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +17,7 @@ import com.example.stores.common.entities.StoreEntity
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.example.stores.editModule.viewModel.EditStoreViewModel
 import com.example.stores.mainModule.MainActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import org.jetbrains.anko.doAsync
@@ -103,7 +106,7 @@ class EditStoreFragment : Fragment() {
                     mStoreEntity.id = it
                     mViewModel.setStoreSelected(mStoreEntity)
                     Toast.makeText(mActivity,getString(R.string.edit_store_message_save_success),Toast.LENGTH_LONG).show()
-                    mActivity?.onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 }
                 is StoreEntity -> {
                     mViewModel.setStoreSelected(mStoreEntity)
@@ -146,6 +149,25 @@ class EditStoreFragment : Fragment() {
             .into(mBinding.imgPhoto)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.dialog_exit_title)
+                    .setMessage(R.string.dialog_exit_message).setPositiveButton(R.string.dialog_exit_ok) { _, _ ->
+                        if (isEnabled){
+                            isEnabled = false
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }
+                    }
+                    .setNegativeButton(R.string.dialog_delete_cancel, null)
+                    .show()
+            }
+        })
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_save,menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -154,7 +176,7 @@ class EditStoreFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             android.R.id.home -> {
-                mActivity?.onBackPressed()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
                 true
             }
             R.id.action_save -> {
