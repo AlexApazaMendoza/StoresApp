@@ -1,17 +1,20 @@
-package com.example.stores
+package com.example.stores.editModule
 
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.view.*
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.stores.R
+import com.example.stores.StoreApplication
+import com.example.stores.common.entities.StoreEntity
 import com.example.stores.databinding.FragmentEditStoreBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.stores.editModule.viewModel.EditStoreViewModel
+import com.example.stores.mainModule.MainActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import org.jetbrains.anko.doAsync
@@ -35,42 +38,21 @@ class EditStoreFragment : Fragment() {
     private var id: Long? = null
 
     private lateinit var mBinding: FragmentEditStoreBinding
-    private var mActivity:MainActivity? = null
+
+    private lateinit var mViewModel: EditStoreViewModel
+
+    private var mActivity: MainActivity? = null
     private var mIsEditMode: Boolean = false
-    private var mStoreEntity: StoreEntity? = null
+    private lateinit var mStoreEntity: StoreEntity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
-            id = it.getLong(getString(R.string.arg_Id),0L)
         }
 
-        if(id != null && id!=0L){
-            mIsEditMode = true
-            getStore(id!!)
-        } else {
-            mIsEditMode = false
-            mStoreEntity = StoreEntity(
-                name = "",
-                phone = "",
-                photoUrl = "",
-                website = ""
-            )
-        }
-
-    }
-
-    private fun getStore(id: Long) {
-        doAsync {
-            mStoreEntity = StoreApplication.database.storeDao().getStore(id)
-            uiThread {
-                if(mStoreEntity != null){
-                    setUiStore(mStoreEntity!!)
-                }
-            }
-        }
+        mViewModel = ViewModelProvider(requireActivity())[EditStoreViewModel::class.java]
     }
 
     private fun setUiStore(storeEntity: StoreEntity) {
@@ -98,8 +80,40 @@ class EditStoreFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpActionBar()
+        setUpViewModel()
         setUpTextFields()
+    }
+
+    private fun setUpViewModel() {
+        mViewModel.getStoreSelected().observe(viewLifecycleOwner){
+            mStoreEntity = it
+            if(it != null){
+                mIsEditMode = true
+                setUiStore(it)
+            } else {
+                mIsEditMode = false
+            }
+            setUpActionBar()
+        }
+
+        mViewModel.getResult().observe(viewLifecycleOwner){
+            mActivity?.hideKeyboard()
+            when(it){
+                is Long -> {
+                    mStoreEntity.id = it
+                    mViewModel.setStoreSelected(mStoreEntity)
+                    Toast.makeText(mActivity,getString(R.string.edit_store_message_save_success),Toast.LENGTH_LONG).show()
+                    mActivity?.onBackPressed()
+                }
+                is StoreEntity -> {
+                    mViewModel.setStoreSelected(mStoreEntity)
+                    Snackbar.make(mBinding.root,R.string.edit_store_message_update_success, Snackbar.LENGTH_SHORT).show()
+                }
+                else -> {
+
+                }
+            }
+        }
     }
 
     private fun setUpActionBar() {
@@ -132,25 +146,6 @@ class EditStoreFragment : Fragment() {
             .into(mBinding.imgPhoto)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
-            override fun handleOnBackPressed() {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.dialog_exit_title)
-                    .setMessage(R.string.dialog_exit_message).setPositiveButton(R.string.dialog_exit_ok) { _, _ ->
-                        if (isEnabled){
-                            isEnabled = false
-                            requireActivity().onBackPressedDispatcher.onBackPressed()
-                        }
-                    }
-                    .setNegativeButton(R.string.dialog_delete_cancel, null)
-                    .show()
-            }
-        })
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_save,menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -159,43 +154,22 @@ class EditStoreFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             android.R.id.home -> {
-                requireActivity().onBackPressedDispatcher.onBackPressed()
+                mActivity?.onBackPressed()
                 true
             }
             R.id.action_save -> {
-                if(mStoreEntity != null && validateFields(mBinding.tilPhotoUrl, mBinding.tilPhone, mBinding.tilName)){
-                    /*val store = StoreEntity(
-                    name = mBinding.etName.text.toString().trim(),
-                    phone = mBinding.etPhone.text.toString().trim(),
-                    website = mBinding.etWebsite.text.toString().trim(),
-                    photoUrl = mBinding.etPhotoUrl.text.toString().trim()
-                    )*/
-                    with(mStoreEntity!!){
+                if(validateFields(mBinding.tilPhotoUrl, mBinding.tilPhone, mBinding.tilName)){
+                    with(mStoreEntity){
                         name = mBinding.etName.text.toString().trim()
                         phone = mBinding.etPhone.text.toString().trim()
                         website = mBinding.etWebsite.text.toString().trim()
                         photoUrl = mBinding.etPhotoUrl.text.toString().trim()
                     }
-                    doAsync {
-                        if (mIsEditMode){
-                            StoreApplication.database.storeDao().updateStore(mStoreEntity!!)
-                        } else{
-                            mStoreEntity!!.id = StoreApplication.database.storeDao().addStore(mStoreEntity!!)
-                        }
-                        uiThread {
-                            mActivity?.hideKeyboard()
-                            if(mIsEditMode){
-                                mActivity?.updateStore(mStoreEntity!!)
-                                Snackbar.make(mBinding.root,R.string.edit_store_message_update_success, Snackbar.LENGTH_SHORT).show()
-                            } else{
-                                mActivity?.addStore(mStoreEntity!!)
 
-                                Toast
-                                    .makeText(mActivity,getString(R.string.edit_store_message_save_success),Toast.LENGTH_LONG)
-                                    .show()
-                                requireActivity().onBackPressedDispatcher.onBackPressed()
-                            }
-                        }
+                    if (mIsEditMode){
+                        mViewModel.updateStore(mStoreEntity)
+                    } else{
+                        mViewModel.saveStore(mStoreEntity)
                     }
                 }
                 true
@@ -224,28 +198,6 @@ class EditStoreFragment : Fragment() {
         return isValid
     }
 
-    private fun validateFields(): Boolean {
-        var isValid = true
-
-        if (mBinding.etPhotoUrl.text.toString().trim().isEmpty()){
-            mBinding.tilPhotoUrl.error = getString(R.string.helper_required)
-            mBinding.etPhotoUrl.requestFocus()
-            isValid =false
-        }
-        if (mBinding.etPhone.text.toString().trim().isEmpty()){
-            mBinding.tilPhone.error = getString(R.string.helper_required)
-            mBinding.etPhone.requestFocus()
-            isValid =false
-        }
-        if (mBinding.etName.text.toString().trim().isEmpty()){
-            mBinding.tilName.error = getString(R.string.helper_required)
-            mBinding.etName.requestFocus()
-            isValid =false
-        }
-
-        return isValid
-    }
-
     override fun onDestroyView() {
         mActivity?.hideKeyboard()
         super.onDestroyView()
@@ -255,7 +207,8 @@ class EditStoreFragment : Fragment() {
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         mActivity?.supportActionBar?.title = getString(R.string.app_name)
 
-        mActivity?.hideFab(true)
+        mViewModel.setShowFav(true)
+        mViewModel.setResult(Any())
         setHasOptionsMenu(false)
         super.onDestroy()
     }

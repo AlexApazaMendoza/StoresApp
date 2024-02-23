@@ -1,4 +1,4 @@
-package com.example.stores
+package com.example.stores.common.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,7 +12,9 @@ data class StoreEntity(
     var photoUrl:String,
     var isFavorite:Boolean = false
 ){
-    override fun equals(other: Any?): Boolean {
+    constructor(): this(name = "", phone = "", photoUrl = "")
+
+    /*override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
@@ -25,5 +27,5 @@ data class StoreEntity(
 
     override fun hashCode(): Int {
         return id.hashCode()
-    }
+    }*/
 }
